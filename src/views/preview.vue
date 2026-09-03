@@ -10,15 +10,19 @@
                 <!-- BASIC INFO -->
                 <div class="card-panel col-span-full">
                     <div class="card-head">
-                        <h2>Basic Info</h2>
+                        <h2>Patient Information</h2>
                     </div>
                     <div class="form-grid">
                         <div class="field">
-                            <label class="field-label">Full Name (NID)</label>
+                            <label class="field-label">Patient ID</label>
+                            <div class="preview-value">{{ form.basic_info?.patient_id || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Full Name</label>
                             <div class="preview-value">{{ form.basic_info?.name || "—" }}</div>
                         </div>
                         <div class="field">
-                            <label class="field-label">NID Number</label>
+                            <label class="field-label">NID</label>
                             <div class="preview-value">{{ form.basic_info?.nid || "—" }}</div>
                         </div>
                         <div class="field">
@@ -33,7 +37,11 @@
                             <label class="field-label">Age</label>
                             <div class="preview-value">{{ form.basic_info?.age ?? "—" }}</div>
                         </div>
-                        <div class="field md:col-span-2">
+                        <div class="field">
+                            <label class="field-label">Date of Birth</label>
+                            <div class="preview-value">{{ form.basic_info?.dob || "—" }}</div>
+                        </div>
+                        <div class="field">
                             <label class="field-label">Mobile No</label>
                             <div class="preview-value">{{ form.basic_info?.mobile || "—" }}</div>
                         </div>
@@ -47,16 +55,24 @@
                 <!-- ADMISSION -->
                 <div class="card-panel col-span-full">
                     <div class="card-head">
-                        <h2>Admission</h2>
+                        <h2>Admission Information</h2>
                     </div>
                     <div class="form-grid">
+                        <div class="field">
+                            <label class="field-label">Admission No</label>
+                            <div class="preview-value">{{ form.admission?.admission_no || "—" }}</div>
+                        </div>
                         <div class="field">
                             <label class="field-label">Unit</label>
                             <div class="preview-value">{{ form.admission?.unit || "—" }}</div>
                         </div>
                         <div class="field">
-                            <label class="field-label">Ward & Bed No</label>
+                            <label class="field-label">Ward</label>
                             <div class="preview-value">{{ form.admission?.ward || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Bed No</label>
+                            <div class="preview-value">{{ form.admission?.bed || "—" }}</div>
                         </div>
                         <div class="field">
                             <label class="field-label">Admission Date</label>
@@ -66,44 +82,148 @@
                             <label class="field-label">Discharge Date</label>
                             <div class="preview-value">{{ form.admission?.discharge_date || "—" }}</div>
                         </div>
+                        <div class="field">
+                            <label class="field-label">Length of Stay</label>
+                            <div class="preview-value">{{ form.admission?.length_of_stay || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Admission Type</label>
+                            <div class="preview-value">{{ form.admission?.admission_type || "—" }}</div>
+                        </div>
                         <div class="field col-span-full">
                             <label class="field-label">Chief Complaint</label>
                             <div class="preview-value">{{ form.admission?.chief_complaint || "—" }}</div>
                         </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Presenting Complaints</label>
+                            <div class="preview-list">
+                                <span v-for="(pc, i) in form.admission?.presenting_complaints" :key="i"
+                                    class="chip">{{ pc.complaint || "—" }}<template v-if="pc.duration"> ({{ pc.duration
+                                        }})</template></span>
+                                <span v-if="!form.admission?.presenting_complaints?.length" class="muted">—</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- COMORBIDITY -->
-                <div class="card-panel">
+                <!-- DISEASE CATEGORY -->
+                <div class="card-panel col-span-full">
                     <div class="card-head">
-                        <h2>Comorbidity</h2>
+                        <h2>Disease Category</h2>
                     </div>
+                    <div class="preview-list">
+                        <span v-for="(c, i) in form.disease_category?.categories" :key="i" class="chip">{{ c }}</span>
+                        <span v-if="!form.disease_category?.categories?.length" class="muted">—</span>
+                    </div>
+                    <div class="form-grid" style="margin-top: 12px">
+                        <div class="field">
+                            <label class="field-label">Primary</label>
+                            <div class="preview-value">{{ form.disease_category?.primary || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Secondary</label>
+                            <div class="preview-value">{{ form.disease_category?.secondary || "—" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COMORBIDITY & HISTORY -->
+                <div class="card-panel col-span-full">
+                    <div class="card-head">
+                        <h2>Comorbidity &amp; History</h2>
+                    </div>
+                    <p class="field-label">Comorbidity</p>
                     <div class="preview-list">
                         <span v-for="(c, i) in computedComorbidity" :key="i" class="chip">{{ c }}</span>
                         <span v-if="!computedComorbidity?.length" class="muted">—</span>
                     </div>
+                    <div class="form-grid" style="margin-top: 12px">
+                        <div class="field col-span-full">
+                            <label class="field-label">Past Illness</label>
+                            <div class="preview-block">{{ form.history?.past_illness || "—" }}</div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Drug History</label>
+                            <div class="preview-block">{{ form.history?.drug_history || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Drug Allergy</label>
+                            <div class="preview-value">{{ form.history?.drug_allergy || "—" }}<template
+                                    v-if="form.history?.drug_allergy_details"> — {{ form.history.drug_allergy_details
+                                    }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Family History</label>
+                            <div class="preview-value">{{ form.history?.family_history_status || "—" }}<template
+                                    v-if="form.history?.family_history"> — {{ form.history.family_history }}</template>
+                            </div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Other History</label>
+                            <div class="preview-block">{{ form.history?.other_history || "—" }}</div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- HISTORY -->
-                <div class="card-panel lg:col-span-2">
+                <!-- GENERAL & SYSTEMIC EXAM -->
+                <div class="card-panel col-span-full">
                     <div class="card-head">
-                        <h2>History</h2>
+                        <h2>General &amp; Systemic Examination</h2>
                     </div>
-                    <div class="space-y-3">
-                        <div class="preview-block">{{ form.history?.past_illness || "—" }}</div>
-                        <div class="preview-block">{{ form.history?.drug_history || "—" }}</div>
-                        <div class="preview-block">{{ form.history?.family_history || "—" }}</div>
-                    </div>
-                </div>
-
-                <!-- EXAMINATION -->
-                <div class="card-panel lg:col-span-2">
-                    <div class="card-head">
-                        <h2>Examination</h2>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="preview-block">{{ form.examination?.general || "—" }}</div>
-                        <div class="preview-block">{{ form.examination?.systemic || "—" }}</div>
+                    <p class="field-label">Vitals</p>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label class="field-label">BP</label>
+                            <div class="preview-value">{{ form.examination?.vitals?.bp || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Pulse</label>
+                            <div class="preview-value">{{ form.examination?.vitals?.pulse || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Temp</label>
+                            <div class="preview-value">{{ form.examination?.vitals?.temp || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">RR</label>
+                            <div class="preview-value">{{ form.examination?.vitals?.rr || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">SpO₂</label>
+                            <div class="preview-value">{{ form.examination?.vitals?.spo2 || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">General Status</label>
+                            <div class="preview-value">{{ form.examination?.general_status || "—" }}<template
+                                    v-if="form.examination?.general_findings"> — {{ form.examination.general_findings
+                                    }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Cardiovascular</label>
+                            <div class="preview-value">{{ form.examination?.cardiovascular || "—" }}<template
+                                    v-if="form.examination?.cardiovascular_findings"> — {{
+                                        form.examination.cardiovascular_findings }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Respiratory</label>
+                            <div class="preview-value">{{ form.examination?.respiratory || "—" }}<template
+                                    v-if="form.examination?.respiratory_findings"> — {{
+                                        form.examination.respiratory_findings }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Abdomen</label>
+                            <div class="preview-value">{{ form.examination?.abdomen || "—" }}<template
+                                    v-if="form.examination?.abdomen_findings"> — {{ form.examination.abdomen_findings
+                                    }}</template></div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Other Examination</label>
+                            <div class="preview-block">{{ form.examination?.other || "—" }}</div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Systemic Summary</label>
+                            <div class="preview-block">{{ form.examination?.systemic || "—" }}</div>
+                        </div>
                     </div>
                 </div>
 
@@ -113,36 +233,80 @@
                         <h2>Neurological Examination</h2>
                     </div>
                     <div class="form-grid">
-                        <div class="preview-value">{{ form.neuro_exam?.gcs || "—" }}</div>
-                        <div class="preview-value">{{ form.neuro_exam?.motor_upper ?? "—" }}</div>
-                        <div class="preview-value">{{ form.neuro_exam?.motor_lower ?? "—" }}</div>
-                        <div class="preview-value">{{ form.neuro_exam?.sensory || "—" }}</div>
-
-                        <div class="col-span-full">
-                            <p class="field-label">Cranial Nerves</p>
-                            <div class="preview-value">
-                                {{ form.neuro_exam.cranial_nerves || "—" }}
-                                <span v-if="form.neuro_exam.cranial_nerves_detail">
-                                    — {{ form.neuro_exam?.cranial_nerves_detail }}
-                                </span>
+                        <div class="field">
+                            <label class="field-label">GCS (E/V/M)</label>
+                            <div class="preview-value">{{ form.neuro_exam?.gcs_eye ?? "—" }} / {{
+                                form.neuro_exam?.gcs_verbal ?? "—" }} / {{ form.neuro_exam?.gcs_motor ?? "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">GCS Total</label>
+                            <div class="preview-value">{{ form.neuro_exam?.gcs_total ?? "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Higher Cerebral</label>
+                            <div class="preview-value">{{ form.neuro_exam?.higher_cerebral || "—" }}<template
+                                    v-if="form.neuro_exam?.higher_cerebral_detail"> — {{
+                                        form.neuro_exam.higher_cerebral_detail }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Speech</label>
+                            <div class="preview-value">{{ form.neuro_exam?.speech || "—" }}<template
+                                    v-if="form.neuro_exam?.speech_other"> — {{ form.neuro_exam.speech_other }}</template>
                             </div>
                         </div>
-
-                        <div class="col-span-full">
-                            <p class="field-label">Reflexes</p>
-                            <div class="preview-value">{{ form.neuro_exam?.reflexes || "—" }}</div>
+                        <div class="field">
+                            <label class="field-label">Cranial Nerves</label>
+                            <div class="preview-value">{{ form.neuro_exam?.cranial_nerves || "—" }}<template
+                                    v-if="form.neuro_exam?.cranial_nerves_detail"> — {{
+                                        form.neuro_exam.cranial_nerves_detail }}</template></div>
                         </div>
-
-                        <div class="preview-value">{{ form.neuro_exam?.plantar || "—" }}</div>
-
-                        <div class="col-span-full">
-                            <p class="field-label">Coordination and Gait</p>
-                            <div class="preview-list">
-                                <span v-for="(c, i) in form.neuro_exam.coordination" :key="i" class="chip">{{ c
-                                    }}</span>
-                                <span v-if="!form.neuro_exam.coordination?.length" class="muted">—</span>
+                        <div class="field">
+                            <label class="field-label">Fundus (R/L)</label>
+                            <div class="preview-value">{{ form.neuro_exam?.fundus_right || "—" }} / {{
+                                form.neuro_exam?.fundus_left || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Sensory</label>
+                            <div class="preview-value">{{ form.neuro_exam?.sensory || "—" }}<template
+                                    v-if="form.neuro_exam?.sensory_detail"> — {{ form.neuro_exam.sensory_detail
+                                    }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Cerebellar</label>
+                            <div class="preview-value">{{ form.neuro_exam?.cerebellar || "—" }}<template
+                                    v-if="form.neuro_exam?.cerebellar_side"> — {{ form.neuro_exam.cerebellar_side
+                                    }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Gait</label>
+                            <div class="preview-value">{{ form.neuro_exam?.gait || "—" }}<template
+                                    v-if="form.neuro_exam?.gait_detail"> — {{ form.neuro_exam.gait_detail }}</template>
                             </div>
                         </div>
+                        <div class="field">
+                            <label class="field-label">Meningeal Signs</label>
+                            <div class="preview-value">{{ form.neuro_exam?.meningeal || "—" }}<template
+                                    v-if="form.neuro_exam?.meningeal_detail"> — {{ form.neuro_exam.meningeal_detail
+                                    }}</template></div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Special Test</label>
+                            <div class="preview-block">{{ form.neuro_exam?.special_test || "—" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLINICAL SCORES -->
+                <div class="card-panel col-span-full">
+                    <div class="card-head">
+                        <h2>Clinical Scores</h2>
+                    </div>
+                    <div class="preview-list">
+                        <span v-for="(s, i) in form.clinical_scores?.selected_scales" :key="i" class="chip">{{ s
+                            }}</span>
+                        <span v-if="form.clinical_scores?.not_applicable" class="chip">Not applicable</span>
+                        <span v-if="!form.clinical_scores?.selected_scales?.length && !form.clinical_scores?.not_applicable"
+                            class="muted">—</span>
                     </div>
                 </div>
 
@@ -151,58 +315,155 @@
                     <div class="card-head">
                         <h2>Investigations</h2>
                     </div>
-
-                    <div class="space-y-4">
-                        <p class="field-label">Imaging Studies</p>
-                        <div class="form-grid">
-                            <div class="preview-value">CT Scan: {{ form.investigations?.ct_scan || "—" }}</div>
-                            <div class="preview-value">MRI: {{ form.investigations?.mri || "—" }}</div>
-                            <div class="preview-value">MRA: {{ form.investigations?.mra || "—" }}</div>
-                            <div class="preview-value">DSA: {{ form.investigations?.dsa || "—" }}</div>
-                            <div class="preview-value">EEG: {{ form.investigations?.eeg || "—" }}</div>
-                            <div class="preview-value">EMG: {{ form.investigations?.emg || "—" }}</div>
-                            <div class="preview-value">NCS: {{ form.investigations?.ncs || "—" }}</div>
-                            <div class="preview-value">Other: {{ form.investigations?.imaging_other || "—" }}</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label class="field-label">CT Brain</label>
+                            <div class="preview-value">{{ form.investigations?.ct_brain_status || "—" }}<template
+                                    v-if="form.investigations?.ct_brain_findings"> — {{
+                                        form.investigations.ct_brain_findings }}</template></div>
                         </div>
-
-                        <div class="divider"></div>
-
-                        <p class="field-label">Laboratory Tests</p>
-                        <div class="form-grid">
-                            <div class="preview-value">CBC: {{ form.investigations?.cbc || "—" }}</div>
-                            <div class="preview-value">Electrolytes: {{ form.investigations?.electrolytes || "—" }}</div>
-                            <div class="preview-value">Glucose: {{ form.investigations?.glucose || "—" }}</div>
-                            <div class="preview-value">Creatinine: {{ form.investigations?.creatinine || "—" }}</div>
+                        <div class="field">
+                            <label class="field-label">MRI Brain</label>
+                            <div class="preview-value">{{ form.investigations?.mri_brain_status || "—" }}<template
+                                    v-if="form.investigations?.mri_brain_findings"> — {{
+                                        form.investigations.mri_brain_findings }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">MRI Spine</label>
+                            <div class="preview-value">{{ form.investigations?.mri_spine_status || "—" }}<template
+                                    v-if="form.investigations?.mri_spine_findings"> — {{
+                                        form.investigations.mri_spine_findings }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Vessel Imaging</label>
+                            <div class="preview-value">{{ form.investigations?.vessel_imaging || "—" }}<template
+                                    v-if="form.investigations?.vessel_findings"> — {{
+                                        form.investigations.vessel_findings }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">DSA</label>
+                            <div class="preview-value">{{ form.investigations?.dsa_status || "—" }}<template
+                                    v-if="form.investigations?.dsa_findings"> — {{ form.investigations.dsa_findings
+                                    }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">EEG</label>
+                            <div class="preview-value">{{ form.investigations?.eeg_status || "—" }}<template
+                                    v-if="form.investigations?.eeg_findings"> — {{ form.investigations.eeg_findings
+                                    }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">NCS</label>
+                            <div class="preview-value">{{ form.investigations?.ncs_status || "—" }}<template
+                                    v-if="form.investigations?.ncs_findings"> — {{ form.investigations.ncs_findings
+                                    }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">EMG</label>
+                            <div class="preview-value">{{ form.investigations?.emg_status || "—" }}<template
+                                    v-if="form.investigations?.emg_findings"> — {{ form.investigations.emg_findings
+                                    }}</template></div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">CBC</label>
+                            <div class="preview-value">{{ form.investigations?.cbc || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Electrolytes</label>
+                            <div class="preview-value">{{ form.investigations?.electrolytes || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Glucose</label>
+                            <div class="preview-value">{{ form.investigations?.glucose || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Creatinine</label>
+                            <div class="preview-value">{{ form.investigations?.creatinine || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">LFT</label>
+                            <div class="preview-value">{{ form.investigations?.lft || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Lipid Profile</label>
+                            <div class="preview-value">{{ form.investigations?.lipid_profile || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">ESR / CRP</label>
+                            <div class="preview-value">{{ form.investigations?.esr_crp || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Other Lab</label>
+                            <div class="preview-value">{{ form.investigations?.lab_other || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">CSF Status</label>
+                            <div class="preview-value">{{ form.investigations?.csf_status || "—" }}</div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">CSF Interpretation</label>
+                            <div class="preview-block">{{ form.investigations?.csf_interpretation || "—" }}</div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Other Investigation</label>
+                            <div class="preview-block">{{ form.investigations?.other_investigation || "—" }}</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- DIAGNOSIS -->
-                <div class="card-panel">
+                <div class="card-panel col-span-full">
                     <div class="card-head">
                         <h2>Diagnosis</h2>
                     </div>
-                    <div class="space-y-3">
-                        <div class="preview-block">{{ form.diagnosis?.primary || "—" }}</div>
-                        <div class="preview-block">{{ form.diagnosis?.secondary || "—" }}</div>
+                    <div class="form-grid">
+                        <div class="field col-span-full">
+                            <label class="field-label">Primary Diagnosis</label>
+                            <div class="preview-block">{{ form.diagnosis?.primary || "—" }}</div>
+                        </div>
+                        <div v-for="(sd, i) in form.diagnosis?.secondary_diagnoses" :key="i" class="field">
+                            <label class="field-label">Secondary Diagnosis {{ i + 1 }}</label>
+                            <div class="preview-value">{{ sd || "—" }}</div>
+                        </div>
+                        <div class="field">
+                            <label class="field-label">Certainty</label>
+                            <div class="preview-value">{{ form.diagnosis?.certainty || "—" }}</div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- TREATMENT -->
-                <div class="card-panel lg:col-span-2">
+                <div class="card-panel col-span-full">
                     <div class="card-head">
                         <h2>Treatment</h2>
                     </div>
-                    <div class="space-y-3">
-                        <div class="preview-block">{{ form.treatment?.medications || "—" }}</div>
-                        <div class="preview-block">{{ form.treatment?.plan || "—" }}</div>
+                    <p class="field-label">Medications</p>
+                    <div class="preview-list">
+                        <span v-for="(m, i) in form.treatment?.medications_list" :key="i" class="chip">{{ m.medication
+                            || "—" }}<template v-if="m.dose"> — {{ m.dose }}</template></span>
+                        <span v-if="!form.treatment?.medications_list?.length" class="muted">—</span>
+                    </div>
+                    <p class="field-label" style="margin-top: 12px">Categories</p>
+                    <div class="preview-list">
+                        <span v-for="(c, i) in form.treatment?.categories" :key="i" class="chip">{{ c }}</span>
+                        <span v-if="!form.treatment?.categories?.length" class="muted">—</span>
+                    </div>
+                    <div class="form-grid" style="margin-top: 12px">
+                        <div class="field col-span-full">
+                            <label class="field-label">Treatment Plan</label>
+                            <div class="preview-block">{{ form.treatment?.plan || "—" }}</div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Supportive Care</label>
+                            <div class="preview-block">{{ form.treatment?.supportive || "—" }}</div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- OUTCOME -->
                 <div class="card-panel col-span-full">
                     <div class="card-head">
-                        <h2>Outcome</h2>
+                        <h2>Discharge Outcome</h2>
                     </div>
                     <div class="form-grid">
                         <div class="field">
@@ -210,32 +471,96 @@
                             <div class="preview-value">{{ form.outcome?.status || "—" }}</div>
                         </div>
                         <div class="field">
+                            <label class="field-label">Discharge Score</label>
+                            <div class="preview-value">{{ form.outcome?.discharge_score?.scale || "—" }}<template
+                                    v-if="form.outcome?.discharge_score?.score"> — {{
+                                        form.outcome.discharge_score.score }}</template></div>
+                        </div>
+                        <div class="field">
                             <label class="field-label">Follow-up Date</label>
                             <div class="preview-value">{{ form.outcome?.followup_date || "—" }}</div>
                         </div>
-                        <div class="col-span-full">
-                            <p class="field-label">Condition at Follow-up</p>
+                        <div class="field col-span-full">
+                            <label class="field-label">Final Diagnosis</label>
+                            <div class="preview-block">{{ form.outcome?.final_diagnosis || "—" }}</div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Discharge Plan</label>
+                            <div class="preview-block">{{ form.outcome?.discharge_plan || "—" }}</div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Condition at Follow-up</label>
                             <div class="preview-list">
                                 <span v-for="(c, i) in form.outcome?.followup_condition" :key="i" class="chip">{{ c
                                     }}</span>
                                 <span v-if="!form.outcome?.followup_condition?.length" class="muted">—</span>
                             </div>
                         </div>
-
-                        <div class="preview-block col-span-full">{{ form.outcome?.resolved_issues || "—" }}</div>
-                        <div class="preview-block col-span-full">{{ form.outcome?.unresolved_problems || "—" }}</div>
-                        <div class="preview-block col-span-full">{{ form.outcome?.comment || "—" }}</div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Resolved Issues</label>
+                            <div class="preview-block">{{ form.outcome?.resolved_issues || "—" }}</div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Unresolved Problems</label>
+                            <div class="preview-block">{{ form.outcome?.unresolved_problems || "—" }}</div>
+                        </div>
+                        <div class="field col-span-full">
+                            <label class="field-label">Comment</label>
+                            <div class="preview-block">{{ form.outcome?.comment || "—" }}</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- FILES -->
+                <!-- FOLLOW-UP -->
                 <div class="card-panel col-span-full">
                     <div class="card-head">
-                        <h2>File Uploads</h2>
+                        <h2>Follow-up</h2>
                     </div>
-                    <div class="thumb-grid">
-                        <img v-for="(f, i) in mergedFiles" :key="i" :src="f" class="thumb" />
-                        <span v-if="!mergedFiles?.length" class="muted">—</span>
+                    <div v-for="(fu, i) in form.follow_ups" :key="i" class="followup-card">
+                        <h4 class="followup-title">Follow-up Visit {{ i + 1 }}</h4>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label class="field-label">Date</label>
+                                <div class="preview-value">{{ fu.date || "—" }}</div>
+                            </div>
+                            <div class="field">
+                                <label class="field-label">Condition</label>
+                                <div class="preview-value">{{ fu.condition || "—" }}</div>
+                            </div>
+                            <div class="field col-span-full">
+                                <label class="field-label">Neurological Status</label>
+                                <div class="preview-block">{{ fu.neurological_status || "—" }}</div>
+                            </div>
+                            <div class="field">
+                                <label class="field-label">Score</label>
+                                <div class="preview-value">{{ fu.score?.scale || "—" }}<template v-if="fu.score?.score">
+                                        — {{ fu.score.score }}</template></div>
+                            </div>
+                            <div class="field col-span-full">
+                                <label class="field-label">Current Medication</label>
+                                <div class="preview-block">{{ fu.current_medication || "—" }}</div>
+                            </div>
+                            <div class="field col-span-full">
+                                <label class="field-label">Further Plan</label>
+                                <div class="preview-block">{{ fu.further_plan || "—" }}</div>
+                            </div>
+                            <div class="field col-span-full">
+                                <label class="field-label">Notes</label>
+                                <div class="preview-block">{{ fu.notes || "—" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <span v-if="!form.follow_ups?.length" class="muted">—</span>
+                </div>
+
+                <!-- DOCUMENTS -->
+                <div class="card-panel col-span-full">
+                    <div class="card-head">
+                        <h2>Documents</h2>
+                    </div>
+                    <div class="preview-list">
+                        <span v-for="(d, i) in form.documents" :key="i" class="chip">{{ d.type }}: {{ d.name }}</span>
+                        <span v-if="!form.documents?.length" class="muted">—</span>
                     </div>
                 </div>
             </div>
@@ -373,6 +698,21 @@ export default {
 .muted {
     color: #8b9a92;
     font-size: 13px;
+}
+
+.followup-card {
+    border: 1.5px solid #dcebe2;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: #fbfdfc;
+}
+
+.followup-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1B5E35;
+    margin: 0 0 10px;
 }
 
 .thumb {
