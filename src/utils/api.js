@@ -1,8 +1,11 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "http://127.0.0.1:8000",
-    // baseURL:"https://medical-indoor.vercel.app"
+    baseURL:
+        import.meta.env.VITE_API_URL ||
+        (import.meta.env.PROD
+            ? "https://medical-indoor.vercel.app"
+            : "http://127.0.0.1:8000"),
 })
 
 // 🔐 Attach token automatically
